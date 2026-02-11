@@ -1,0 +1,41 @@
+{
+  "wordbank": {
+    "default": {
+      "easy": [
+  "cat","dog","fish","bird","tree","sun","moon","star","cloud","rain",
+  "snow","car","bus","train","boat","plane","house","bed","chair","table",
+  "apple","banana","grape","pizza","burger","cake","ice cream","cookie","egg","bread",
+  "ball","kite","book","phone","clock","cup","hat","shoe","sock","flower",
+  "leaf","mountain","river","beach","island","key","heart","smile","eye","hand",
+  "foot","nose","ear","tooth","shirt","pants","jacket","bag","door","window",
+  "spoon","fork","knife","plate","bottle","lamp","mirror","camera","guitar","drum"
+]
+,
+      "medium": [
+  "bicycle","robot","castle","bridge","volcano","tornado","spaceship","rocket","satellite","submarine",
+  "helmet","backpack","cactus","pyramid","statue","island","waterfall","igloo","barn","tractor",
+  "panda","elephant","giraffe","zebra","lion","tiger","shark","whale","octopus","penguin",
+  "microscope","telescope","compass","anchor","hourglass","shield","sword","crown","treasure","map",
+  "skateboard","roller coaster","traffic light","lighthouse","hot air balloon","windmill","barn","farm","barn owl","scarecrow",
+  "castle tower","knight","wizard","dragon","ghost","alien","monster","dinosaur","mermaid","unicorn",
+  "rainbow","lightning","snowman","fire","campfire","tent","forest","jungle","desert","ocean"
+]
+,
+      "hard": [
+  "freedom","gravity","time","memory","dream","fear","love","justice","chaos","energy",
+  "internet","algorithm","virus","bacteria","atom","molecule","quantum","galaxy","universe","black hole",
+  "democracy","economy","inflation","currency","investment","strategy","competition","ambition","motivation","success",
+  "balance","symmetry","infinity","paradox","illusion","shadow","reflection","silence","echo","whisper",
+  "karma","destiny","future","past","history","legend","myth","tradition","culture","identity",
+  "creativity","invention","innovation","technology","virtual reality","artificial intelligence","robotics","cyberspace","network","blockchain",
+  "glitch","simulation","multiverse","parallel universe","evolution","extinction","mutation","climate change","pollution","sustainability"
+]
+
+    }
+  },
+  "meta": {
+    "dailyWordState": {
+      "index": 0
+    }
+  }
+}

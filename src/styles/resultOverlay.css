@@ -1,0 +1,273 @@
+/* ===== FULLSCREEN OVERLAY ===== */
+
+.result-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+
+  display: grid;
+  place-items: center;
+  padding: 24px;
+
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+
+  opacity: 0;
+  transition: opacity 240ms ease;
+}
+
+.result-overlay.visible {
+  opacity: 1;
+}
+
+/* ===== PANEL ===== */
+
+.result-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.result-panel {
+  width: min(720px, 95vw);
+  max-height: 90vh;
+  overflow: auto;
+
+  border-radius: 28px;
+  padding: 24px;
+
+  color: rgba(255, 255, 255, 0.92);
+
+  background: linear-gradient(
+    180deg,
+    rgba(20, 20, 24, 0.96),
+    rgba(14, 14, 18, 0.94)
+  );
+
+  border: 1px solid rgba(255, 255, 255, 0.14);
+
+  box-shadow:
+    0 50px 160px rgba(0, 0, 0, 0.65),
+    0 0 0 1px rgba(255, 255, 255, 0.04) inset;
+
+  transform: translateY(10px) scale(0.98);
+  transition: transform 240ms ease;
+}
+
+.result-overlay.visible .result-panel {
+  transform: translateY(0px) scale(1);
+}
+
+/* ===== HEADER ===== */
+
+.result-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.result-title {
+  font-size: 18px;
+  font-weight: 1100;
+}
+
+.result-subtitle {
+  font-size: 12px;
+  opacity: 0.65;
+  margin-top: 4px;
+}
+
+.result-close {
+  padding: 8px 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.06);
+  color: white;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.result-close:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* ===== WORD CARD ===== */
+
+.result-word-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 16px;
+  border-radius: 18px;
+
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.05);
+
+  margin-bottom: 18px;
+}
+
+.result-word-label {
+  font-size: 12px;
+  opacity: 0.65;
+}
+
+.result-word {
+  font-size: 22px;
+  font-weight: 1200;
+}
+
+.result-needed {
+  text-align: right;
+}
+
+/* ===== SCORE CARD ===== */
+
+.result-score-card {
+  padding: 20px;
+  border-radius: 18px;
+
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.05);
+
+  display: grid;
+  gap: 10px;
+
+  justify-items: center;
+  text-align: center;
+}
+
+
+/* ===== RESULT STATES ===== */
+
+.result-win,
+.result-lose {
+  font-size: 26px;
+  font-weight: 1200;
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.result-win {
+  color: #8bffb4;
+}
+
+.result-lose {
+  color: #ff9a9a;
+}
+
+
+/* ===== IMAGE ===== */
+
+.result-image {
+  width: min(420px, 100%);
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: white;
+
+  margin-top: 18px;
+  justify-self: center;
+}
+
+.result-panel {
+  scrollbar-width: none;
+}
+
+.result-panel::-webkit-scrollbar {
+  display: none;
+}
+
+/* ===== HEADER CENTERED ===== */
+
+.result-header-centered {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+/* ===== 3 COLUMN GRID ===== */
+
+.result-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 32px;
+  align-items: start;
+}
+
+/* Stack on small screens */
+@media (max-width: 1000px) {
+  .result-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+}
+
+.result-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 16px;
+}
+
+/* ===== WORD COLUMN ===== */
+
+.result-section-title {
+  font-size: 13px;
+  opacity: 0.6;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.result-word-large {
+  font-size: 32px;
+  font-weight: 1200;
+}
+
+.result-needed-block {
+  margin-top: 8px;
+  opacity: 0.75;
+  font-size: 14px;
+}
+
+.result-needed-value {
+  font-size: 20px;
+  font-weight: 1100;
+  margin-top: 4px;
+}
+
+/* ===== IMAGE COLUMN ===== */
+
+.result-image-large {
+  width: 100%;
+  max-width: 360px;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+
+  border-radius: 22px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: white;
+}
+
+/* ===== RESULT BUTTON ===== */
+
+.result-home-btn {
+  margin-top: 40px;
+  padding: 14px 20px;
+  border-radius: 18px;
+  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(255,255,255,0.08);
+  color: white;
+  font-weight: 1000;
+  text-decoration: none;
+  text-align: center;
+  transition: 0.2s ease;
+}
+
+.result-home-btn:hover {
+  background: rgba(255,255,255,0.16);
+}

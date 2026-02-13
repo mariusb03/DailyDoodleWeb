@@ -3,6 +3,7 @@ import { useAnonAuth } from '../lib/useAnonAuth';
 
 import Home from '../pages/Home';
 import Play from '../pages/Play';
+import AppLayout from '../layouts/AppLayout';
 
 export default function App() {
   const { user, ready } = useAnonAuth();
@@ -14,8 +15,10 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/play" element={<Play user={user} />} />
+        <Route element={<AppLayout user={user} />}>
+          <Route path="/" element={<Home user={user} />} />
+          <Route path="/play" element={<Play user={user} />} />
+        </Route>
       </Routes>
     </BrowserRouter>
   );

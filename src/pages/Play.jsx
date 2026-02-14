@@ -3,13 +3,17 @@ import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 import DoodleCanvas from '../features/doodle/DoodleCanvas';
-import { createAttemptPending, uploadDoodlePng } from '../features/doodle/doodleService';
+import {
+  createAttemptPending,
+  uploadDoodlePng,
+} from '../features/doodle/doodleService';
 import { isValidDateKey, getUtcDateKey } from '../lib/date';
 
 import { useDailyWord } from '../features/play/useDailyWord';
 import { useDailyAttempt } from '../features/play/useDailyAttempt';
 import { useLockBodyScroll } from '../features/play/useLockBodyScroll';
 import ResultOverlay from '../features/play/ResultOverlay';
+import IntroOverlay from '../features/play/IntroOverlay';
 
 export default function Play({ user }) {
   const [params] = useSearchParams();
@@ -20,16 +24,27 @@ export default function Play({ user }) {
     return getUtcDateKey();
   }, [params]);
 
-  const { daily, loading: dailyLoading, error: dailyError } = useDailyWord(dateKey);
+  const {
+    daily,
+    loading: dailyLoading,
+    error: dailyError,
+  } = useDailyWord(dateKey);
   const { attempt, alreadyPlayedToday } = useDailyAttempt(user, dateKey);
 
   const [pngBlob, setPngBlob] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
 
+  const [showIntro, setShowIntro] = useState(false);
   const [showResults, setShowResults] = useState(false);
 
   const computedThreshold = daily?.threshold ?? 0.75;
+
+  useEffect(() => {
+    if (!alreadyPlayedToday && daily?.word) {
+      setShowIntro(true);
+    }
+  }, [alreadyPlayedToday, daily?.word]);
 
   // auto open overlay when attempt exists
   useEffect(() => {
@@ -41,7 +56,8 @@ export default function Play({ user }) {
   async function onSubmit() {
     setError('');
 
-    if (alreadyPlayedToday) return setError("You've already played today. Come back tomorrow!");
+    if (alreadyPlayedToday)
+      return setError("You've already played today. Come back tomorrow!");
     if (!user?.uid) return setError('Not signed in.');
     if (!daily?.word) return setError("Today's word isn't available yet.");
     if (!pngBlob) return setError('Draw something first 🙂');
@@ -97,10 +113,14 @@ export default function Play({ user }) {
             WebkitBackdropFilter: 'blur(10px)',
           }}
         >
-          {dailyLoading && <div style={{ opacity: 0.85 }}>Loading today’s word…</div>}
+          {dailyLoading && (
+            <div style={{ opacity: 0.85 }}>Loading today’s word…</div>
+          )}
 
           {!dailyLoading && dailyError && (
-            <div style={{ color: 'crimson', fontWeight: 800 }}>{dailyError}</div>
+            <div style={{ color: 'crimson', fontWeight: 800 }}>
+              {dailyError}
+            </div>
           )}
 
           {!dailyLoading && !dailyError && (
@@ -117,7 +137,9 @@ export default function Play({ user }) {
                 <>
                   <div style={{ fontSize: 18, fontWeight: 1100 }}>
                     Today’s word:{' '}
-                    <span style={{ textTransform: 'lowercase' }}>{daily.word}</span>
+                    <span style={{ textTransform: 'lowercase' }}>
+                      {daily.word}
+                    </span>
                   </div>
                   <div style={{ fontSize: 12, opacity: 0.7 }}>
                     Solo • Daily Word • One attempt per day
@@ -130,7 +152,14 @@ export default function Play({ user }) {
 
         {/* CANVAS */}
         {!alreadyPlayedToday && (
-          <section style={{ display: 'grid', justifyItems: 'center', gap: 10, padding: 10 }}>
+          <section
+            style={{
+              display: 'grid',
+              justifyItems: 'center',
+              gap: 10,
+              padding: 10,
+            }}
+          >
             <DoodleCanvas
               width={640}
               height={640}
@@ -142,10 +171,19 @@ export default function Play({ user }) {
               submitLabel="Submit"
             />
 
-            {error && <span style={{ color: 'crimson', fontWeight: 900 }}>{error}</span>}
+            {error && (
+              <span style={{ color: 'crimson', fontWeight: 900 }}>{error}</span>
+            )}
           </section>
         )}
       </div>
+
+      <IntroOverlay
+        open={showIntro}
+        difficulty={daily?.difficulty}
+        word={daily?.word}
+        onContinue={() => setShowIntro(false)}
+      />
 
       {/* RESULTS OVERLAY */}
       <ResultOverlay

@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-vars */
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { collection, onSnapshot, query, where } from 'firebase/firestore';
 
 import DoodleCanvas from '../features/doodle/DoodleCanvas';
 import {
@@ -10,10 +11,29 @@ import {
 import { isValidDateKey, getUtcDateKey } from '../lib/date';
 
 import { useDailyWord } from '../features/play/useDailyWord';
-import { useDailyAttempt } from '../features/play/useDailyAttempt';
 import { useLockBodyScroll } from '../features/play/useLockBodyScroll';
 import ResultOverlay from '../features/play/ResultOverlay';
 import IntroOverlay from '../features/play/IntroOverlay';
+
+import { db } from '../lib/firebase';
+
+function pickAttemptForDate(docs, uid, dateKey) {
+  const attemptId = `${uid}_${dateKey}`;
+
+  // 1) Best: exact id match
+  const byId = docs.find((d) => d.id === attemptId);
+  if (byId) return byId;
+
+  // 2) Next: dateKey field match
+  const byDateKey = docs.find((d) => String(d.dateKey || '') === dateKey);
+  if (byDateKey) return byDateKey;
+
+  // 3) Fallback: some people store it as "date"
+  const byDate = docs.find((d) => String(d.date || '') === dateKey);
+  if (byDate) return byDate;
+
+  return null;
+}
 
 export default function Play({ user }) {
   const [params] = useSearchParams();
@@ -24,12 +44,18 @@ export default function Play({ user }) {
     return getUtcDateKey();
   }, [params]);
 
-  const {
-    daily,
-    loading: dailyLoading,
-    error: dailyError,
-  } = useDailyWord(dateKey);
-  const { attempt, alreadyPlayedToday } = useDailyAttempt(user, dateKey);
+  const { daily, loading: dailyLoading, error: dailyError } = useDailyWord(dateKey);
+  const computedThreshold = daily?.threshold ?? 0.75;
+
+  // optimistic attempt shown instantly after submit
+  const [localAttempt, setLocalAttempt] = useState(null);
+
+  // real attempt from Firestore (live)
+  const [liveAttempt, setLiveAttempt] = useState(null);
+
+  // prefer live; fallback to optimistic
+  const attempt = liveAttempt || localAttempt;
+  const alreadyPlayedToday = !!attempt;
 
   const [pngBlob, setPngBlob] = useState(null);
   const [submitting, setSubmitting] = useState(false);
@@ -38,17 +64,67 @@ export default function Play({ user }) {
   const [showIntro, setShowIntro] = useState(false);
   const [showResults, setShowResults] = useState(false);
 
-  const computedThreshold = daily?.threshold ?? 0.75;
+  // prevents “intro opens again immediately” after user closes it
+  const [introDismissed, setIntroDismissed] = useState(false);
 
+  // Reset when user/date changes
   useEffect(() => {
-    if (!alreadyPlayedToday && daily?.word) {
-      setShowIntro(true);
+    setLocalAttempt(null);
+    setLiveAttempt(null);
+    setShowResults(false);
+    setShowIntro(false);
+    setIntroDismissed(false);
+    setError('');
+    setPngBlob(null);
+  }, [user?.uid, dateKey]);
+
+  /**
+   * ✅ Robust live attempt listener
+   * We only query by uid, then find the correct "today" attempt locally.
+   * This works even if your doc uses:
+   * - id = `${uid}_${dateKey}` OR auto-id
+   * - dateKey OR date
+   */
+  useEffect(() => {
+    if (!user?.uid) return;
+
+    const attemptsRef = collection(db, 'attempts');
+    const q = query(attemptsRef, where('uid', '==', user.uid));
+
+    const unsub = onSnapshot(
+      q,
+      (snap) => {
+        const docs = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+        const todays = pickAttemptForDate(docs, user.uid, dateKey);
+
+        setLiveAttempt(todays || null);
+
+        // If we now have the real attempt (pending or scored), drop optimistic
+        if (todays) setLocalAttempt(null);
+      },
+      (err) => {
+        console.error('Attempt listener error:', err);
+      },
+    );
+
+    return () => unsub();
+  }, [user?.uid, dateKey]);
+
+  // Show intro once when entering play page (only if user hasn't played and we have the word)
+  useEffect(() => {
+    if (!daily?.word) return;
+    if (alreadyPlayedToday) return;
+    if (introDismissed) return;
+
+    setShowIntro(true);
+  }, [daily?.word, alreadyPlayedToday, introDismissed]);
+
+  // Auto open results overlay when attempt exists
+  useEffect(() => {
+    if (alreadyPlayedToday) {
+      setShowIntro(false);
+      setShowResults(true);
     }
-  }, [alreadyPlayedToday, daily?.word]);
-
-  // auto open overlay when attempt exists
-  useEffect(() => {
-    if (alreadyPlayedToday) setShowResults(true);
   }, [alreadyPlayedToday]);
 
   useLockBodyScroll(showResults && alreadyPlayedToday);
@@ -71,6 +147,25 @@ export default function Play({ user }) {
         pngBlob,
       });
 
+      // ✅ optimistic UI instantly
+      setLocalAttempt({
+        status: 'pending',
+        mode: 'classic',
+        imageURL: downloadURL,
+        confidence: null,
+        openaiGuess: null,
+        isWin: null,
+        threshold: computedThreshold,
+        dateKey,
+        uid: user.uid,
+      });
+
+      // close intro + open results
+      setShowIntro(false);
+      setIntroDismissed(true);
+      setShowResults(true);
+
+      // Create attempt doc (Cloud Function updates later to scored)
       await createAttemptPending({
         uid: user.uid,
         dateKey,
@@ -81,13 +176,12 @@ export default function Play({ user }) {
         threshold: computedThreshold,
       });
     } catch (e) {
+      setLocalAttempt(null);
       setError(e?.message || 'Something went wrong.');
     } finally {
       setSubmitting(false);
     }
   }
-
-  //#region HTML
 
   return (
     <main
@@ -178,16 +272,20 @@ export default function Play({ user }) {
         )}
       </div>
 
+      {/* INTRO OVERLAY */}
       <IntroOverlay
-        open={showIntro}
+        open={showIntro && !alreadyPlayedToday}
         difficulty={daily?.difficulty}
         word={daily?.word}
-        onContinue={() => setShowIntro(false)}
+        onContinue={() => {
+          setShowIntro(false);
+          setIntroDismissed(true);
+        }}
       />
 
       {/* RESULTS OVERLAY */}
       <ResultOverlay
-        open={showResults && alreadyPlayedToday}
+        open={showResults && !!attempt}
         attempt={attempt}
         threshold={computedThreshold}
         word={daily?.word}

@@ -271,3 +271,34 @@
 .result-home-btn:hover {
   background: rgba(255,255,255,0.16);
 }
+
+/* progress bar */
+.result-progress {
+  width: 100%;
+  height: 10px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35) inset;
+}
+
+.result-progress-bar {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(0, 120, 255, 0.9), rgba(120, 80, 255, 0.9));
+  box-shadow: 0 0 24px rgba(0, 120, 255, 0.35);
+  transition: width 180ms ease;
+}
+
+/* subtle pulsing text */
+.result-pulse {
+  display: inline-block;
+  animation: resultPulse 1.4s ease-in-out infinite;
+}
+
+@keyframes resultPulse {
+  0% { opacity: 0.55; transform: translateY(0); }
+  50% { opacity: 1; transform: translateY(-1px); }
+  100% { opacity: 0.55; transform: translateY(0); }
+}

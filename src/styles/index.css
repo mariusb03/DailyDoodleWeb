@@ -1,11 +1,11 @@
 :root {
-  --bg: #0b0f17;
-  --card: rgba(255, 255, 255, 0.06);
-  --card2: rgba(255, 255, 255, 0.09);
-  --text: rgba(255, 255, 255, 0.92);
-  --muted: rgba(255, 255, 255, 0.65);
-  --border: rgba(255, 255, 255, 0.12);
-  --shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+  --bg: #ffffff;
+  --text: rgba(20, 20, 24, 0.92);
+  --muted: rgba(20, 20, 24, 0.62);
+  --border: rgba(20, 20, 24, 0.14);
+  --card: rgba(255, 255, 255, 0.60);
+  --card2: rgba(255, 255, 255, 0.72);
+  --shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
   --radius: 18px;
 }
 
@@ -13,11 +13,13 @@
   box-sizing: border-box;
 }
 
+#root {
+  position: relative;
+  isolation: isolate;
+}
 html,
 body,
-#root {
-  height: 100%;
-}
+
 
 body {
   margin: 0;
@@ -32,23 +34,7 @@ body {
     'Apple Color Emoji',
     'Segoe UI Emoji';
   color: var(--text);
-  background:
-    radial-gradient(
-      1200px 800px at 20% 0%,
-      rgba(99, 102, 241, 0.35),
-      transparent 55%
-    ),
-    radial-gradient(
-      900px 600px at 90% 20%,
-      rgba(16, 185, 129, 0.18),
-      transparent 55%
-    ),
-    radial-gradient(
-      900px 600px at 40% 90%,
-      rgba(236, 72, 153, 0.18),
-      transparent 55%
-    ),
-    var(--bg);
+  
 }
 
 a {
@@ -338,4 +324,29 @@ body {
 
 body::-webkit-scrollbar {
   display: none; /* Chrome, Safari */
+}
+
+.app-shell {
+  position: relative; /* ✅ creates a context above z-index:-1 background */
+  z-index: 0;
+  min-height: 100vh;
+}
+
+/* ensures a clean stacking model */
+.app-root {
+  position: relative;
+  min-height: 100vh;
+}
+
+/* everything in your app must be above the background */
+.app-foreground {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+}
+
+/* optional: prevents weirdness with some browser compositing */
+#root {
+  position: relative;
+  isolation: isolate;
 }

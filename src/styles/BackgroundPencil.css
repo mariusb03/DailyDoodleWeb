@@ -1,0 +1,92 @@
+/* White-ish "canvas paper" background + ink behind subtle glass */
+
+.bgp-wrap {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+  
+    /* Paper base */
+    background: #f7f6f2;
+  }
+  
+  /* Paper texture layer */
+  .bgp-wrap::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+  
+    /* soft fibers + faint grid-like weave */
+    background:
+      radial-gradient(1200px 800px at 20% 10%, rgba(0,0,0,0.05), transparent 60%),
+      radial-gradient(900px 650px at 85% 30%, rgba(0,0,0,0.035), transparent 60%),
+      repeating-linear-gradient(
+        90deg,
+        rgba(0,0,0,0.018) 0 1px,
+        transparent 1px 6px
+      ),
+      repeating-linear-gradient(
+        0deg,
+        rgba(0,0,0,0.012) 0 1px,
+        transparent 1px 10px
+      );
+  
+    opacity: 0.55;
+    mix-blend-mode: multiply;
+    pointer-events: none;
+  }
+  
+  /* 2D ink */
+  .bgp-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  
+    /* soften ink slightly */
+    filter: blur(0.4px);
+    opacity: 0.95;
+  
+    /* this makes graphite feel more natural on paper */
+    mix-blend-mode: multiply;
+  }
+  
+  /* 3D pencil layer */
+  .bgp-3d {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+  }
+  
+  /* Make the R3F canvas transparent + non-interactive */
+  .bgp-3d canvas {
+    width: 100% !important;
+    height: 100% !important;
+    display: block;
+    pointer-events: none !important;
+    background: transparent !important;
+  }
+  
+  /* Subtle glass overlay (DO NOT make this strong or it "greys" everything) */
+  .bg-glass {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+  
+    /* very subtle frosted layer */
+    background:
+      radial-gradient(circle at 30% 20%, rgba(255,255,255,0.35), transparent 40%),
+      radial-gradient(circle at 80% 35%, rgba(255,255,255,0.22), transparent 45%),
+      rgba(255,255,255,0.06);
+  
+    backdrop-filter: blur(10px) saturate(1.05);
+    -webkit-backdrop-filter: blur(10px) saturate(1.05);
+  
+    opacity: 0.55;
+  }
+  
+  /* IMPORTANT:
+     Keep your actual app ABOVE the background.
+     Do this in your layout (app-foreground z-index: 1+) rather than global selectors here.
+  */

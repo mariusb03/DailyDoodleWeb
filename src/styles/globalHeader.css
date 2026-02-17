@@ -62,10 +62,7 @@
     border-radius: 0 clamp(10px, 1.2vw, 14px) clamp(10px, 1.2vw, 14px) 0;
   
     /* extra depth so it pops */
-    box-shadow:
-      0 22px 70px rgba(0, 0, 0, 0.55),
-      0 10px 24px rgba(0, 0, 0, 0.28),
-      0 0 0 1px rgba(255, 255, 255, 0.10) inset;
+    
   
     filter: saturate(1.05) contrast(1.02);
   }

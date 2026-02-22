@@ -35,7 +35,7 @@ export default function Home() {
       <header
         className="card"
         style={{
-          padding: 22,
+          padding: 21,
           marginBottom: 18,
           background: 'linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03))',
         }}

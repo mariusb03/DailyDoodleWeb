@@ -1,3 +1,4 @@
+/* BackgroundPencil3D.jsx */
 import React from 'react';
 import { useEffect, useMemo, useRef } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
@@ -154,7 +155,7 @@ function PencilModel({ url, stateRef }) {
 
     // smooth (framerate-independent)
     const k = 1 - Math.pow(0.001, dt);
-    const follow = 0.22 * k;
+    const follow = 0.990 * k;
     smooth.current.nx = THREE.MathUtils.lerp(smooth.current.nx, nx, follow);
     smooth.current.ny = THREE.MathUtils.lerp(smooth.current.ny, ny, follow);
 

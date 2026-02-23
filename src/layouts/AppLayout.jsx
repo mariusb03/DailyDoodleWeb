@@ -1,4 +1,5 @@
 // AppLayout.jsx
+import React from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import GlobalHeader from '../components/GlobalHeader';
 import BackgroundPencil3D from '../components/BackgroundPencil3D';
